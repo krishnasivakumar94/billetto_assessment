@@ -1,0 +1,92 @@
+<main class="page-shell">
+  <header class="site-header">
+    <a class="brand" href="<%= root_path %>" aria-label="Billette Assessment home">
+      <span class="brand-mark">B</span>
+      <span>Billette Assessment</span>
+    </a>
+    <div class="header-actions">
+      <div id="clerk-user-button" hidden></div>
+      <button class="sign-in-button" id="clerk-sign-in" type="button">Sign in <span aria-hidden="true">↗</span></button>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span></span> GOOD THINGS ARE HAPPENING</p>
+      <h1 id="hero-title">Make room for<br><em>something live.</em></h1>
+      <p class="hero-description">Find the gigs, gatherings and little moments worth going out for.</p>
+      <a class="hero-cta" href="#events">Find your next event <span aria-hidden="true">↓</span></a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-sun"></div>
+      <span class="hero-star star-one">✳</span>
+      <span class="hero-star star-two">✦</span>
+      <span class="hero-art-label">SHOW UP<br>FEEL MORE</span>
+    </div>
+    <div class="hero-index"><span>01</span> / DISCOVER</div>
+  </section>
+
+  <section class="events-section" id="events" aria-labelledby="events-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow eyebrow-dark">THE WHAT'S ON</p>
+        <h2 id="events-title">Worth stepping out for<span class="heading-period">.</span></h2>
+      </div>
+      <p class="event-total"><strong><%= @events.size.to_s.rjust(2, "0") %></strong><span>events<br>to explore</span></p>
+    </div>
+
+    <% if @events.any? %>
+      <% if @events.all? { |event| event.billetto_id.start_with?("sample-") } %>
+        <p class="sample-note"><span>i</span> Preview mode — sample content with a demo upvote. Connect the Billetto public events API to show live listings.</p>
+      <% end %>
+      <div class="event-grid">
+        <% @events.each_with_index do |event, index| %>
+          <article class="event-card">
+            <div class="event-visual event-visual-<%= index % 4 %>">
+              <% if event.image_url.present? %>
+                <img src="<%= event.image_url %>" alt="" loading="lazy">
+              <% else %>
+                <div class="visual-shape" aria-hidden="true"><span>✳</span></div>
+              <% end %>
+              <span class="event-date"><%= event.starts_at.strftime("%b") %><strong><%= event.starts_at.strftime("%d") %></strong></span>
+              <% if event.billetto_id.start_with?("sample-") %><span class="sample-tag">SAMPLE</span><% end %>
+              <span class="visual-index">NO. <%= (index + 1).to_s.rjust(2, "0") %></span>
+            </div>
+            <div class="event-content">
+              <p class="event-meta"><span><%= event.starts_at.strftime("%A · %-I:%M %p") %></span><i></i><span>LIVE EVENT</span></p>
+              <h3><%= event.title %></h3>
+              <% if event.description.present? %><p class="event-description"><%= truncate(strip_tags(event.description), length: 120) %></p><% end %>
+              <div class="event-actions">
+                <% if event.billetto_url.present? %><a class="ticket-link" href="<%= event.billetto_url %>" target="_blank" rel="noopener">Event details ↗</a><% end %>
+                <div class="vote-actions" aria-label="Vote on this event">
+                  <%= button_to event_vote_path(event), params: { value: 1 }, method: :post, class: "vote-button", form: { class: "event-vote-form" }, aria: { label: "Upvote #{event.title}" } do %>
+                    <span aria-hidden="true">↑</span> <%= @vote_counts.fetch([event.id, 1], 0) %>
+                  <% end %>
+                  <%= button_to event_vote_path(event), params: { value: -1 }, method: :post, class: "vote-button vote-down", form: { class: "event-vote-form" }, aria: { label: "Downvote #{event.title}" } do %>
+                    <span aria-hidden="true">↓</span> <%= @vote_counts.fetch([event.id, -1], 0) %>
+                  <% end %>
+                </div>
+                <span class="vote-hint">Clerk sign-in required</span>
+              </div>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <span class="empty-mark">✳</span>
+        <h3>It's a little quiet here.</h3>
+        <p>Import public events from Billetto to fill your line-up.</p>
+        <code>bin/rails events:import</code>
+      </div>
+    <% end %>
+  </section>
+
+  <div id="auth-status" class="auth-status" role="status" aria-live="polite" hidden></div>
+
+  <footer class="site-footer">
+    <span class="brand"><span class="brand-mark">B</span><span>Billette Assessment</span></span>
+  </footer>
+</main>

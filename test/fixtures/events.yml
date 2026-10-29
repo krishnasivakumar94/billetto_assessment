@@ -1,0 +1,12 @@
+
+one:
+  billetto_id: "billetto-1"
+  title: "Test event"
+  starts_at: 2026-11-01 10:00:00
+  image_url: https://example.test/image.jpg
+  description: A test event
+two:
+  billetto_id: "billetto-2"
+  title: "Sample theatre event"
+  starts_at: 2026-12-01 19:30:00
+  description: Sample event record for local development.
